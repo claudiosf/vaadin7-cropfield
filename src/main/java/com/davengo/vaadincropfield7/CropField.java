@@ -1,30 +1,24 @@
 package com.davengo.vaadincropfield7;
 
+import com.davengo.vaadincropfield7.widgetset.client.CropFieldState;
 import com.davengo.vaadincropfield7.widgetset.client.ui.VCropSelection;
 import com.vaadin.server.Resource;
+import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractField;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.CustomField;
-import com.vaadin.ui.Image;
 
 /**
- * Vaadin component that shows an image with an overlayed cropping
- * functionality. The current selection can be set and get via
- * setValue()/getValue() of {@link AbstractField}. The type of that value has to
- * be {@link VCropSelection}. Usually, the selection will not be changed to a
+ * Vaadin component that shows an image with an overlayed cropping functionality. The current
+ * selection can be set and get via setValue()/getValue() of {@link AbstractField}. The type of that
+ * value has to be {@link VCropSelection}. Usually, the selection will not be changed to a
  * <i>null</i> value. Instead, it will be an empty selection (check with
  * {@link VCropSelection#isEmpty()}).
- * 
+ *
  * @author Eric Seckler
  */
-public class CropField extends CustomField {
+public class CropField extends AbstractComponent {
 
 	private static final long serialVersionUID = -2206503821175058316L;
-
 	protected Resource imageResource;
-	
-	protected Image image = new Image();
-
 	protected int trueImageWidth;
 	protected int trueImageHeight;
 	protected int minSelectionWidth;
@@ -37,21 +31,58 @@ public class CropField extends CustomField {
 
 	/**
 	 * Create a new CropField with a given resource as image to be cropped.
-	 * 
-	 * @param imageResource
-	 *            the Resource to be used as image
+	 *
+	 * @param imageResource the Resource to be used as image
 	 */
 	public CropField(Resource imageResource) {
 		super();
 		setImageResource(imageResource);
+		setState();
+	}
+
+	private void setState() {
+
+		CropFieldState state = getState();
+
+		state.imageSrc = imageResource;
+
+		if (trueImageWidth != 0) {
+			state.trueImageWidth = trueImageWidth;
+		}
+		if (trueImageHeight != 0) {
+			state.trueImageHeight = trueImageHeight;
+		}
+		if (minSelectionWidth != 0) {
+			state.minSelectionWidth = minSelectionWidth;
+		}
+
+		if (minSelectionHeight != 0) {
+			state.minSelectionHeight = minSelectionHeight;
+		}
+		if (maxSelectionWidth != 0) {
+			state.maxSelectionWidth = maxSelectionWidth;
+		}
+		if (maxSelectionHeight != 0) {
+			state.maxSelectionHeight = maxSelectionHeight;
+		}
+		if (selectionAspectRatio != 0) {
+			state.selectionAspectRatio = selectionAspectRatio;
+		}
+		if (animateToSelection != null) {
+			state.animateToSelection = animateToSelection.toStringArray();
+			if (animateToDuration != null) {
+				state.animateToDuration = animateToDuration;
+			}
+			animateToSelection = null;
+			animateToDuration = null;
+		}
 	}
 
 //	@Override
 //	public void paintContent(PaintTarget target) throws PaintException {
 //
-//// TODO converter para usar shared state http://dev.vaadin.com/wiki/Vaadin7/SharedState	
-////		super.paintContent(target);
-//		
+//// TODO converter para usar shared state http://dev.vaadin.com/wiki/Vaadin7/SharedState
+//
 //		target.addAttribute(VCropField.ATTR_IMAGE_RESOURCE, imageResource);
 //
 //		if (trueImageWidth != 0)
@@ -90,14 +121,16 @@ public class CropField extends CustomField {
 //		if (value == null) {
 //			value = new VCropSelection();
 //		}
-////		target.addVariable(this, VCropField.VAR_SELECTION,
-////				value.toStringArray());
+//		target.addVariable(this, VCropField.VAR_SELECTION,
+//				value.toStringArray());
 //	}
-
+//	
+//
 //	@Override
 //	public void changeVariables(Object source, Map<String, Object> variables) {
 //
 //		// TODO converter para usar shared state http://dev.vaadin.com/wiki/Vaadin7/SharedState	
+//		
 ////		super.changeVariables(source, variables);
 //
 //		if (variables.containsKey(VCropField.VAR_SELECTION) && !isReadOnly()) {
@@ -114,7 +147,6 @@ public class CropField extends CustomField {
 //			}
 //		}
 //	}
-
 	/**
 	 * @return the Resource that was set to be used as image
 	 */
@@ -124,9 +156,8 @@ public class CropField extends CustomField {
 
 	/**
 	 * Change the Resource to be used as image.
-	 * 
-	 * @param imageResource
-	 *            the Resource (a <i>null</i> value is NOT allowed)
+	 *
+	 * @param imageResource the Resource (a <i>null</i> value is NOT allowed)
 	 */
 	public void setImageResource(Resource imageResource) {
 		if (imageResource == null) {
@@ -134,7 +165,6 @@ public class CropField extends CustomField {
 					"a null value for the image resource is not allowed");
 		}
 		this.imageResource = imageResource;
-		this.image.setSource(imageResource);
 	}
 
 	/**
@@ -145,23 +175,14 @@ public class CropField extends CustomField {
 	}
 
 	/**
-	 * <p>
-	 * If you choose to present the image in a scaled mode (i.e. by setting the
-	 * extent of this component), you can set the true width of the image
-	 * (non-scaled width), so that the selection the user performs on the scaled
-	 * image is rescaled to fit the true image width.
-	 * </p>
-	 * <p>
-	 * All other selection coordinates/extents will always correlate to the true
-	 * image coordinate system.
-	 * </p>
-	 * <p>
-	 * If no true image width is set (i.e. set to 0), the width of the (scaled)
-	 * component is used to form the true image height.
-	 * </p>
-	 * 
-	 * @param trueImageWidth
-	 *            the width that should be used for calculation of the selection
+	 * <p> If you choose to present the image in a scaled mode (i.e. by setting the extent of this
+	 * component), you can set the true width of the image (non-scaled width), so that the selection
+	 * the user performs on the scaled image is rescaled to fit the true image width. </p> <p> All
+	 * other selection coordinates/extents will always correlate to the true image coordinate
+	 * system. </p> <p> If no true image width is set (i.e. set to 0), the width of the (scaled)
+	 * component is used to form the true image height. </p>
+	 *
+	 * @param trueImageWidth the width that should be used for calculation of the selection
 	 */
 	public void setTrueImageWidth(int trueImageWidth) {
 		this.trueImageWidth = trueImageWidth;
@@ -176,23 +197,14 @@ public class CropField extends CustomField {
 	}
 
 	/**
-	 * <p>
-	 * If you choose to present the image in a scaled mode (i.e. by setting the
-	 * extent of this component), you can set the true height of the image
-	 * (non-scaled height), so that the selection the user performs on the
-	 * scaled image is rescaled to fit the true image height.
-	 * </p>
-	 * <p>
-	 * All other selection coordinates/extents will always correlate to the true
-	 * image coordinate system.
-	 * </p>
-	 * <p>
-	 * If no true image height is set (i.e. set to 0), the height of the
-	 * (scaled) component is used to form the true image height.
-	 * </p>
-	 * 
-	 * @param trueImageHeight
-	 *            the height that should be used for calculation of the selection
+	 * <p> If you choose to present the image in a scaled mode (i.e. by setting the extent of this
+	 * component), you can set the true height of the image (non-scaled height), so that the
+	 * selection the user performs on the scaled image is rescaled to fit the true image height.
+	 * </p> <p> All other selection coordinates/extents will always correlate to the true image
+	 * coordinate system. </p> <p> If no true image height is set (i.e. set to 0), the height of the
+	 * (scaled) component is used to form the true image height. </p>
+	 *
+	 * @param trueImageHeight the height that should be used for calculation of the selection
 	 */
 	public void setTrueImageHeight(int trueImageHeight) {
 		this.trueImageHeight = trueImageHeight;
@@ -207,11 +219,10 @@ public class CropField extends CustomField {
 	}
 
 	/**
-	 * Set the minimum width of a non-empty selection. The client side component
-	 * will force the selection extent to correspond to this value.
-	 * 
-	 * @param minSelectionWidth
-	 *            the minimum width of a non-empty selection
+	 * Set the minimum width of a non-empty selection. The client side component will force the
+	 * selection extent to correspond to this value.
+	 *
+	 * @param minSelectionWidth the minimum width of a non-empty selection
 	 */
 	public void setMinSelectionWidth(int minSelectionWidth) {
 		this.minSelectionWidth = minSelectionWidth;
@@ -226,11 +237,10 @@ public class CropField extends CustomField {
 	}
 
 	/**
-	 * Set the minimum height of a non-empty selection. The client side
-	 * component will force the selection extent to correspond to this value.
-	 * 
-	 * @param minSelectionHeight
-	 *            the minimum height of a non-empty selection
+	 * Set the minimum height of a non-empty selection. The client side component will force the
+	 * selection extent to correspond to this value.
+	 *
+	 * @param minSelectionHeight the minimum height of a non-empty selection
 	 */
 	public void setMinSelectionHeight(int minSelectionHeight) {
 		this.minSelectionHeight = minSelectionHeight;
@@ -245,11 +255,10 @@ public class CropField extends CustomField {
 	}
 
 	/**
-	 * Set the maximum width of a selection. The client side component will
-	 * force the selection extent to correspond to this value.
-	 * 
-	 * @param maxSelectionWidth
-	 *            the maximum width of a selection
+	 * Set the maximum width of a selection. The client side component will force the selection
+	 * extent to correspond to this value.
+	 *
+	 * @param maxSelectionWidth the maximum width of a selection
 	 */
 	public void setMaxSelectionWidth(int maxSelectionWidth) {
 		this.maxSelectionWidth = maxSelectionWidth;
@@ -264,11 +273,10 @@ public class CropField extends CustomField {
 	}
 
 	/**
-	 * Set the maximum height of a selection. The client side component will
-	 * force the selection extent to correspond to this value.
-	 * 
-	 * @param maxSelectionHeight
-	 *            the maximum height of a selection
+	 * Set the maximum height of a selection. The client side component will force the selection
+	 * extent to correspond to this value.
+	 *
+	 * @param maxSelectionHeight the maximum height of a selection
 	 */
 	public void setMaxSelectionHeight(int maxSelectionHeight) {
 		this.maxSelectionHeight = maxSelectionHeight;
@@ -283,12 +291,11 @@ public class CropField extends CustomField {
 	}
 
 	/**
-	 * Set the aspect ratio (width / height) the selection has to conform to.
-	 * Can be used in combination with min/max width/height. The client side
-	 * component will force the selection extent to correspond to this value.
-	 * 
-	 * @param selectionAspectRatio
-	 *            the aspect ratio (width / height) of any selection
+	 * Set the aspect ratio (width / height) the selection has to conform to. Can be used in
+	 * combination with min/max width/height. The client side component will force the selection
+	 * extent to correspond to this value.
+	 *
+	 * @param selectionAspectRatio the aspect ratio (width / height) of any selection
 	 */
 	public void setSelectionAspectRatio(float selectionAspectRatio) {
 		this.selectionAspectRatio = selectionAspectRatio;
@@ -296,27 +303,24 @@ public class CropField extends CustomField {
 	}
 
 	/**
-	 * animate the change of the current selection to the given new selection
-	 * with a default duration defined by the client side component.
-	 * 
-	 * @param selection
-	 *            the new selection (a <i>null</i> value is NOT allowed, use an
-	 *            empty selection for such a case)
+	 * animate the change of the current selection to the given new selection with a default
+	 * duration defined by the client side component.
+	 *
+	 * @param selection the new selection (a <i>null</i> value is NOT allowed, use an empty
+	 * selection for such a case)
 	 */
 	public void animateTo(VCropSelection selection) {
 		animateTo(selection, null);
 	}
 
 	/**
-	 * animate the change of the current selection to the given new selection
-	 * with the given duration.
-	 * 
-	 * @param selection
-	 *            the new selection (a <i>null</i> value is NOT allowed, use an
-	 *            empty selection for such a case)
-	 * @param duration
-	 *            the duration of the selection in milliseconds or <i>null</i>
-	 *            for a default duration
+	 * animate the change of the current selection to the given new selection with the given
+	 * duration.
+	 *
+	 * @param selection the new selection (a <i>null</i> value is NOT allowed, use an empty
+	 * selection for such a case)
+	 * @param duration the duration of the selection in milliseconds or <i>null</i> for a default
+	 * duration
 	 */
 	public void animateTo(VCropSelection selection, Integer duration) {
 		if (selection == null) {
@@ -329,13 +333,7 @@ public class CropField extends CustomField {
 	}
 
 	@Override
-	protected Component initContent() {
-		return this.image;
+	protected CropFieldState getState() {
+		return (CropFieldState) super.getState();
 	}
-
-	@Override
-	public Class getType() {
-		return VCropSelection.class;
-	}
-	
 }

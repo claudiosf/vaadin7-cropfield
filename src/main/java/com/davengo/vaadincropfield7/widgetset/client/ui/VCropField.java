@@ -2,13 +2,12 @@ package com.davengo.vaadincropfield7.widgetset.client.ui;
 
 import com.davengo.vaadincropfield7.widgetset.client.ui.VCropImage.SelectionFinishEvent;
 import com.davengo.vaadincropfield7.widgetset.client.ui.VCropImage.SelectionFinishHandler;
-import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.vaadin.client.ApplicationConnection;
-import com.vaadin.client.Paintable;
 import com.vaadin.client.UIDL;
 import com.vaadin.client.Util;
+import com.vaadin.ui.Window.ResizeEvent;
 
 /**
  * Client side widget of the {@link com.davengo.web.vaadin.crop.CropField
@@ -17,7 +16,7 @@ import com.vaadin.client.Util;
  * 
  * @author Eric Seckler
  */
-public class VCropField extends SimplePanel implements Paintable {
+public class VCropField extends SimplePanel {
 
 	/** Set the CSS class name to allow styling. */
 	public static final String CLASSNAME = "v-cropfield";
@@ -55,10 +54,10 @@ public class VCropField extends SimplePanel implements Paintable {
 		super();
 
 		setWidget(cropImage = new VCropImage());
-
+		
 		cropImage.addResizeHandler(new ResizeHandler() {
 			@Override
-			public void onResize(ResizeEvent event) {
+			public void onResize(com.google.gwt.event.logical.shared.ResizeEvent event) {
 				Util.notifyParentOfSizeChange(VCropField.this, false);
 			}
 		});
